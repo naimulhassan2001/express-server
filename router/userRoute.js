@@ -1,4 +1,5 @@
 const express = require("express");
+const upload = require("../middlerware/multer");
 
 const userRouter = express.Router();
 
@@ -16,7 +17,8 @@ userRouter.get("/:id", (req, res) => {
   });
 });
 
-userRouter.post("/", (req, res) => {
+userRouter.post("/", upload.single("image"), (req, res) => {
+  console.log(req.file);
   console.log(req.body);
   res.send("this is home page with post request");
 });
