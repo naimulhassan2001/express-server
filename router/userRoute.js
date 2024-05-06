@@ -1,26 +1,103 @@
 const express = require("express");
 const upload = require("../middlerware/multer");
+const userModel = require("../model/user_model");
 
 const userRouter = express.Router();
 
-userRouter.get("/", (req, res) => {
-  res.json({
-    Status: true,
-    Message: `this is user route with get request ${req.originalUrl}`,
-  });
+userRouter.get("/", async (req, res) => {
+  try {
+    const users = await userModel.find();
+    res.json({
+      Status: true,
+      data: users,
+      Message: `this is user route with get request ${req.originalUrl}`,
+    });
+  } catch {
+    res.status(500).json({
+      Message: "internal server error",
+    });
+  }
 });
 
-userRouter.get("/:id", (req, res) => {
-  res.json({
-    Status: true,
-    Message: `this is user route with get request ${req.originalUrl}`,
-  });
+userRouter.get("/:id", async (req, res) => {
+  try {
+    const user = await userModel.findOne({ _id: req.params.id });
+    if (!user) {
+      res.status(404).json({
+        Status: false,
+        Message: `User not found`,
+        data: user,
+      });
+      return;
+    }
+    res.json({
+      Status: true,
+      Message: `this is user route with get request ${req.originalUrl}`,
+      data: user,
+    });
+  } catch (e) {
+    res.status(500).json({
+      Message: `internal server error${e}`,
+    });
+  }
 });
 
-userRouter.post("/", upload.single("image"), (req, res) => {
-  console.log(req.file);
-  console.log(req.body);
-  res.send("this is home page with post request");
+userRouter.post("/", async (req, res) => {
+  try {
+    const newUser = userModel(req.body);
+    const user = await newUser.save();
+    res.json(user);
+  } catch {
+    res.status(500).json({
+      Message: "internal server error",
+    });
+  }
+  // await newUser.save((err) => {
+  //   if (!err) {
+  //     res.json({
+  //       Message: "user inserted successfully",
+  //     });
+  //   } else {
+  //     res.status(500).json({
+  //       Message: "internal server error",
+  //     });
+  //   }
+  // });
 });
+
+userRouter.post("/all", async (req, res) => {
+  const users = await userModel.insertMany(req.body);
+  res.json(users);
+});
+userRouter.patch("/:id", async (req, res) => {
+  const users = await userModel.findOneAndUpdate(
+    { _id: req.params.id },
+    { $set: { name: req.body.name } },
+    { new: true }
+  );
+  res.json(users);
+});
+
+userRouter.delete("/:id", async (req, res) => {
+  try {
+    await userModel.deleteOne({ _id: req.params.id });
+    res.json({
+      Status: true,
+      Message: "User delete successfully",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      Status: false,
+      Message: "Internal server error",
+    });
+  }
+});
+
+// userRouter.post("/", upload.single("image"), (req, res) => {
+//   console.log(req.file);
+//   console.log(req.body);
+//   res.send("this is home page with post request");
+// });
 
 module.exports = userRouter;
