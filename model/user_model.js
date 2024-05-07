@@ -21,6 +21,24 @@ const schema = mongoose.Schema({
   },
 });
 
+schema.methods = {
+  findByName: function () {
+    return mongoose.model("User").find();
+  },
+};
+
+schema.statics = {
+  findByName: function () {
+    return mongoose.model("User").find();
+  },
+};
+
+schema.query = {
+  query: function (language) {
+    return this.find({ name: new RegExp(language, "i") });
+  },
+};
+
 const userModel = new mongoose.model("User", schema);
 
 module.exports = userModel;

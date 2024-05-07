@@ -19,6 +19,55 @@ userRouter.get("/", async (req, res) => {
   }
 });
 
+userRouter.get("/instance", async (req, res) => {
+  try {
+    const user = new userModel();
+    const users = await user.findByName();
+    res.json({
+      Status: true,
+      Message: `this is user route with get request ${req.originalUrl}`,
+      data: users,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      Message: "internal server error",
+    });
+  }
+});
+
+userRouter.get("/static", async (req, res) => {
+  try {
+    const users = await userModel.findByName();
+    res.json({
+      Status: true,
+      Message: `this is user route with get request ${req.originalUrl}`,
+      data: users,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      Message: "internal server error",
+    });
+  }
+});
+
+userRouter.get("/query", async (req, res) => {
+  try {
+    const users = await userModel.findByName().query("2");
+    res.json({
+      Status: true,
+      Message: `this is user route with get request ${req.originalUrl}`,
+      data: users,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      Message: "internal server error",
+    });
+  }
+});
+
 userRouter.get("/:id", async (req, res) => {
   try {
     const user = await userModel.findOne({ _id: req.params.id });
