@@ -1,10 +1,11 @@
 const express = require("express");
 const upload = require("../middlerware/multer");
 const userModel = require("../model/user_model");
+const { checkToken, create } = require("../middlerware/check_token");
 
 const userRouter = express.Router();
 
-userRouter.get("/", async (req, res) => {
+userRouter.get("/", checkToken, async (req, res) => {
   try {
     const users = await userModel.find();
     res.json({
@@ -97,6 +98,49 @@ userRouter.post("/", async (req, res) => {
     const user = await newUser.save();
     res.json(user);
   } catch {
+    res.status(500).json({
+      Message: "internal server error",
+    });
+  }
+  // await newUser.save((err) => {
+  //   if (!err) {
+  //     res.json({
+  //       Message: "user inserted successfully",
+  //     });
+  //   } else {
+  //     res.status(500).json({
+  //       Message: "internal server error",
+  //     });
+  //   }
+  // });
+});
+
+userRouter.post("/signIn", async (req, res) => {
+  try {
+    const user = await userModel.findOne({ email: req.body.email });
+
+    if (!user) {
+      res.status(404).json({
+        Message: "user not found",
+      });
+
+      return;
+    }
+
+    const accessToken = await create(user);
+
+    user.accessToken = accessToken;
+
+    res.json({
+      Status: true,
+      Message: "Sign in successfully!",
+      data: {
+        data: user,
+        accessToken: user.accessToken,
+      },
+    });
+  } catch (err) {
+    console.log(err);
     res.status(500).json({
       Message: "internal server error",
     });
