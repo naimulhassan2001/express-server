@@ -7,7 +7,7 @@ const userRouter = express.Router();
 
 userRouter.get("/", checkToken, async (req, res) => {
   try {
-    const users = await userModel.find();
+    const users = await userModel.find().populate('todos');
     res.json({
       Status: true,
       data: users,
@@ -135,7 +135,7 @@ userRouter.post("/signIn", async (req, res) => {
       Status: true,
       Message: "Sign in successfully!",
       data: {
-        data: user,
+        user: user,
         accessToken: user.accessToken,
       },
     });

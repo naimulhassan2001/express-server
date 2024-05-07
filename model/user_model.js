@@ -9,6 +9,10 @@ const schema = mongoose.Schema({
     type: String,
     required: true,
   },
+  password : {
+    type: String,
+    required : true
+  },
   role: {
     type: String,
     eunm: ["User", "Admin"],
@@ -19,6 +23,12 @@ const schema = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  todos:[
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Todo"
+    }
+  ]
 });
 
 schema.methods = {
