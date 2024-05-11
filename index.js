@@ -10,7 +10,7 @@ dotenv.config();
 console.log(process.env.JWT_SECRET);
 app.use(express.json());
 mongoose
-  .connect("mongodb://localhost:27017/Todos")
+  .connect(process.env.MONGODB_CONNECT_STRING)
   .then(() => console.log("mongoose connect successfully"))
   .catch((e) => console.log(e));
 
