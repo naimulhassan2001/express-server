@@ -96,6 +96,7 @@ userRouter.post("/", async (req, res) => {
   try {
     const newUser = userModel(req.body);
     const user = await newUser.save();
+    const token = await create(user);
     res.json(user);
   } catch {
     res.status(500).json({
